@@ -1,0 +1,6 @@
+config.toml
+.env
+visibility.db
+report.html
+monitor.log
+__pycache__/

@@ -1,0 +1,38 @@
+# Copy this file to config.toml and fill it in.
+# API keys can go here or in environment variables (safer):
+#   OPENAI_API_KEY, ANTHROPIC_API_KEY, PERPLEXITY_API_KEY, MONITOR_WEBHOOK_URL
+
+[settings]
+repeats = 3                 # runs per customer question per provider (AI answers vary)
+pause_seconds = 1.0         # wait between API calls
+alert_drop_points = 15      # alert when mention rate falls this many points since last check
+database = "visibility.db"
+report_file = "report.html"
+# webhook_url = "https://hooks.slack.com/services/..."   # optional: post a summary after each run
+# extract_model_claude = "claude-haiku-5-5"               # model that reads answers and lists businesses
+# extract_model_openai = "gpt-5-mini"
+
+[providers.chatgpt]
+enabled = true
+model = "gpt-5"            # any OpenAI model that supports the web_search tool
+
+[providers.claude]
+enabled = true
+model = "claude-sonnet-5-5"
+
+[providers.perplexity]
+enabled = false
+model = "sonar"
+
+# One [[clients]] block per business. `id` must be unique and never change,
+# because history is saved under it.
+[[clients]]
+id = "brightline"
+name = "Brightline Signs"
+category = "sign company"          # how a customer would say it
+city = "Columbus, OH"
+website = "brightlinesigns.com"
+aliases = ["Brightline Sign Co"]   # other spellings to count as a mention
+extra_questions = [
+  "Who makes monument signs for businesses in Columbus, OH?",
+]

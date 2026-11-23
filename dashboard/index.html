@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Visibility Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: client rail on the left; right side reads status tiles → trend with change markers → question-by-question movement → sources → change log → run history. */
+:root {
+  --bg: #f4f5f7; --surface: #ffffff; --ink: #17202b; --muted: #5b6676; --line: #dfe3e9;
+  --accent: #2a55c4; --accent-soft: #e6ecfa;
+  --good: #1d7a4c; --good-soft: #e2f3ea; --warn: #9a6400; --warn-soft: #fbf0d9; --bad: #b3322a; --bad-soft: #fbe5e3;
+  --font-display: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f141b; --surface: #171e27; --ink: #e7ebf1; --muted: #9aa5b4; --line: #2a3441;
+    --accent: #7c9cf0; --accent-soft: #1e2a45;
+    --good: #5cc48f; --good-soft: #15301f; --warn: #e0a83c; --warn-soft: #33270f; --bad: #ef7d73; --bad-soft: #3a1a17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f141b; --surface: #171e27; --ink: #e7ebf1; --muted: #9aa5b4; --line: #2a3441;
+  --accent: #7c9cf0; --accent-soft: #1e2a45;
+  --good: #5cc48f; --good-soft: #15301f; --warn: #e0a83c; --warn-soft: #33270f; --bad: #ef7d73; --bad-soft: #3a1a17;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 18px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 700; }
+p { margin: 0; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+header.top { max-width: 1240px; margin: 0 auto; padding: 28px 20px 8px; display: grid; gap: 6px; }
+header.top p { color: var(--muted); max-width: 72ch; }
+main { max-width: 1240px; margin: 0 auto; padding: 16px 20px 48px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; display: grid; gap: 10px; min-width: 0; }
+aside { display: grid; gap: 16px; position: sticky; top: 16px; }
+@media (max-width: 900px) { aside { position: static; } }
+.client-list { display: grid; gap: 6px; }
+.client-btn { text-align: left; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; display: grid; gap: 2px; font-weight: 600; }
+.client-btn small { font-weight: 400; color: var(--muted); }
+.client-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+label { display: grid; gap: 4px; font-weight: 600; font-size: 14px; }
+label small { font-weight: 400; color: var(--muted); }
+input, textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); }
+textarea { resize: vertical; min-height: 60px; }
+input:focus-visible, textarea:focus-visible, button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { font: inherit; font-weight: 600; cursor: pointer; border-radius: 7px; padding: 9px 14px; border: 1px solid var(--accent); background: var(--accent); color: #fff; }
+button.ghost { background: transparent; color: var(--accent); }
+button.danger { background: transparent; color: var(--bad); border-color: var(--bad); }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.hint { font-size: 13px; color: var(--muted); }
+.status { font-size: 14px; padding: 9px 12px; border-radius: 7px; background: var(--accent-soft); }
+.status.err { background: var(--bad-soft); color: var(--bad); }
+.status:empty { display: none; }
+.content { display: grid; gap: 16px; min-width: 0; }
+.client-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; justify-content: space-between; }
+.client-head .meta { color: var(--muted); font-size: 14px; }
+.row-btns { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.banner { padding: 10px 14px; border-radius: 8px; background: var(--warn-soft); color: var(--warn); font-size: 14px; font-weight: 600; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 700px) { .tiles { grid-template-columns: 1fr 1fr; } }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 2px; }
+.tile .label { font-size: 13px; color: var(--muted); font-weight: 600; }
+.tile .value { font-family: var(--font-mono); font-size: 28px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tile .sub { font-size: 13px; color: var(--muted); }
+.tile.good .value { color: var(--good); } .tile.warn .value { color: var(--warn); } .tile.bad .value { color: var(--bad); }
+.delta-up { color: var(--good); } .delta-down { color: var(--bad); }
+.chart-wrap { overflow-x: auto; }
+.chart-wrap svg { display: block; width: 100%; min-width: 520px; height: auto; }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 18px; height: 0; border-top: 3px solid var(--accent); display: inline-block; }
+.sw.dash { border-top: 2px dashed var(--muted); }
+.sw.mark { width: 0; height: 12px; border-top: 0; border-left: 2px dashed var(--warn); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+.table-wrap { overflow-x: auto; }
+.pill { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; white-space: nowrap; display: inline-block; }
+.pill.hit { background: var(--good-soft); color: var(--good); }
+.pill.miss { background: var(--bad-soft); color: var(--bad); }
+.pill.neutral { background: var(--warn-soft); color: var(--warn); }
+.pill.info { background: var(--accent-soft); color: var(--accent); }
+.move { font-size: 12px; font-weight: 600; white-space: nowrap; }
+.sov { display: grid; gap: 8px; }
+.sov-row { display: grid; grid-template-columns: minmax(110px, 220px) 1fr 52px; gap: 10px; align-items: center; font-size: 14px; }
+.sov-row.you .name { font-weight: 700; color: var(--accent); }
+.bar { height: 12px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--line); }
+.bar span { display: block; height: 100%; background: var(--muted); opacity: .55; }
+.sov-row.you .bar span { background: var(--accent); opacity: 1; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 1000px) { .two { grid-template-columns: 1fr; } }
+.changes { display: grid; gap: 8px; }
+.change { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; }
+.change .n { font-family: var(--font-mono); font-weight: 600; color: var(--warn); }
+.change p { font-size: 14px; } .change .when { font-size: 12px; color: var(--muted); }
+form.inline { display: grid; gap: 10px; }
+.grid2 { display: grid; grid-template-columns: 140px 1fr; gap: 10px; }
+@media (max-width: 560px) { .grid2 { grid-template-columns: 1fr; } }
+details.ans summary { cursor: pointer; color: var(--accent); font-size: 13px; }
+details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg); border-radius: 6px; padding: 8px 10px; margin-top: 6px; max-height: 220px; overflow: auto; }
+.method { font-size: 14px; color: var(--muted); }
+.method ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>AI Visibility Monitor</h1>
+  <p>Tracks whether AI assistants recommend each client, week over week. Every check is saved, fixes are logged on the timeline, and a scheduled check re-runs the same questions with live web search every Monday.</p>
+</header>
+
+<main>
+  <aside>
+    <div class="panel">
+      <h2>Clients</h2>
+      <div class="client-list" id="clientList"><p class="hint">Loading…</p></div>
+    </div>
+    <form class="panel" id="addClient" novalidate>
+      <h2>Add a client</h2>
+      <label for="cName">Business name<input id="cName" autocomplete="off" placeholder="e.g. Brightline Signs"></label>
+      <label for="cCat">What they do <small>as a customer says it</small><input id="cCat" autocomplete="off" placeholder="e.g. sign company"></label>
+      <label for="cCity">City or area<input id="cCity" autocomplete="off" placeholder="e.g. Columbus, OH"></label>
+      <label for="cSite">Website <small>optional</small><input id="cSite" autocomplete="off" placeholder="brightlinesigns.com"></label>
+      <button type="submit" id="addBtn">Add and start tracking</button>
+      <p class="hint">The 8 tracking questions are fixed when the client is added, so every check is comparable.</p>
+      <div class="status" id="addStatus" role="status"></div>
+    </form>
+  </aside>
+
+  <section class="content" id="content" aria-live="polite"></section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const norm = (s) => String(s || "").toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\b(the|inc|llc|co|company|corp|ltd)\b/g, " ").replace(/\s+/g, " ").trim();
+  const sameBiz = (a, b) => { const x = norm(a), y = norm(b); return !!x && !!y && (x === y || x.includes(y) || y.includes(x)); };
+  const fmtDate = (iso) => { try { return new Date(iso).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" }); } catch { return iso; } };
+  const SEARCH = "search", NOSEARCH = "nosearch";
+
+  function buildQuestions(name, cat, city) {
+    return [
+      { q: `What's the best ${cat} in ${city}?`, branded: false },
+      { q: `Can you recommend a good ${cat} near ${city}?`, branded: false },
+      { q: `Who is the top-rated ${cat} in ${city}?`, branded: false },
+      { q: `I need an affordable ${cat} in ${city}. Who should I call?`, branded: false },
+      { q: `Which ${cat} in ${city} has the best reviews?`, branded: false },
+      { q: `Compare the top ${cat} options in ${city}.`, branded: false },
+      { q: `What ${cat} in ${city} would you suggest for a small business?`, branded: false },
+      { q: `Is ${name} in ${city} a good ${cat}?`, branded: true }
+    ];
+  }
+
+  // ---------- Summary math (same for live, scheduled and example runs) ----------
+  function summarize(results, business) {
+    const unb = results.filter(r => !r.branded && Array.isArray(r.businesses));
+    const hits = unb.filter(r => r.mentioned);
+    const pos = hits.map(r => r.position).filter(Number.isFinite);
+    const counts = new Map();
+    for (const r of unb) {
+      const seen = new Set();
+      for (const b of r.businesses) {
+        const key = [...counts.keys()].find(k => sameBiz(k, b)) || b;
+        if (seen.has(key)) continue; seen.add(key);
+        counts.set(key, (counts.get(key) || 0) + 1);
+      }
+    }
+    let you = [...counts.keys()].find(k => sameBiz(k, business));
+    if (!you) { you = business; counts.set(you, hits.length); }
+    let sov = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+    let top = sov.slice(0, 6);
+    if (!top.some(([k]) => k === you)) top = [...top.slice(0, 5), [you, counts.get(you)]];
+    const brand = results.find(r => r.branded);
+    return {
+      hits: hits.length, total: unb.length,
+      rate: unb.length ? Math.round(100 * hits.length / unb.length) : 0,
+      avgPos: pos.length ? +(pos.reduce((a, b) => a + b, 0) / pos.length).toFixed(1) : null,
+      sov: top, you, brandSentiment: brand ? (brand.sentiment || null) : null
+    };
+  }
+
+  // ---------- Example (made-up) so the page is never empty ----------
+  const EX_Q = buildQuestions("Brightline Signs", "sign company", "Columbus, OH");
+  const exRun = (at, mode, hitsIdx, posMap, extra) => ({
+    at, mode, engine: mode === SEARCH ? "Claude + web search" : "Claude, no web search",
+    results: EX_Q.map((x, i) => ({
+      ...x,
+      mentioned: x.branded ? true : hitsIdx.includes(i),
+      position: x.branded ? 1 : (hitsIdx.includes(i) ? (posMap[i] || 3) : null),
+      businesses: x.branded ? ["Brightline Signs"] :
+        (hitsIdx.includes(i) ? (() => { const a = ["Capital City Signworks", "Arrow Sign Co.", "Olentangy Graphics"]; a.splice((posMap[i] || 3) - 1, 0, "Brightline Signs"); return a; })() : ["Capital City Signworks", "Arrow Sign Co.", "Olentangy Graphics"]),
+      sentiment: x.branded ? (extra && extra.brand) || "unknown" : null,
+      sources: mode === SEARCH ? ["yelp.com", "expertise.com", "bbb.org"].concat(hitsIdx.includes(i) ? ["brightlinesigns.com"] : []) : [],
+      answer: "Example answer (made-up data)."
+    }))
+  });
+  const EXAMPLE = {
+    client: { id: "example", name: "Brightline Signs", category: "sign company", city: "Columbus, OH", website: "brightlinesigns.com", questions: EX_Q, example: true },
+    runs: [
+      exRun("2026-10-05T12:00:00Z", SEARCH, [1], {}, { brand: "unknown" }),
+      exRun("2026-10-12T12:00:00Z", SEARCH, [1], {}, { brand: "unknown" }),
+      exRun("2026-10-19T12:00:00Z", SEARCH, [1, 5], {}, { brand: "neutral" }),
+      exRun("2026-10-26T12:00:00Z", SEARCH, [0, 1, 5], { 0: 3 }, { brand: "neutral" }),
+      exRun("2026-11-02T12:00:00Z", SEARCH, [0, 1, 3, 5], { 0: 2 }, { brand: "positive" }),
+      exRun("2026-11-09T12:00:00Z", SEARCH, [0, 1, 2, 3, 5], { 0: 2, 2: 2 }, { brand: "positive" }),
+      exRun("2026-11-16T12:00:00Z", SEARCH, [0, 1, 2, 3, 4, 5], { 0: 1, 2: 2 }, { brand: "positive" })
+    ],
+    changes: [
+      { date: "2026-10-08", what: "Completed Google Business Profile, claimed Bing Places and Foursquare", targets: "All questions" },
+      { date: "2026-10-22", what: "Published pricing page for storefront signs", targets: "Affordable question" },
+      { date: "2026-11-04", what: "Listed in two local 'best sign companies' roundups", targets: "Best and top-rated questions" }
+    ],
+    schedule: { cadence: "Weekly, Mondays", next: "2026-11-30T12:40:00Z" }
+  };
+
+  // ---------- State ----------
+  let db = null, sample = null;
+  let clients = [], selectedId = null, runs = [], changes = [], schedule = null;
+  let unsubRuns = null, unsubChanges = null, running = false, confirmRemove = false;
+  let dbState = "loading"; // loading | ready | none
+
+  // ---------- Rendering ----------
+  function renderClientList() {
+    const el = $("clientList");
+    if (dbState === "none") { el.innerHTML = `<p class="hint">Saved clients need this page opened from Claude while signed in. Showing an example.</p>`; return; }
+    if (dbState === "loading") { el.innerHTML = `<p class="hint">Loading…</p>`; return; }
+    if (!clients.length) { el.innerHTML = `<p class="hint">No clients yet. Add one below. Until then, the example on the right shows what tracking looks like.</p>`; return; }
+    el.innerHTML = clients.map(c => `
+      <button type="button" class="client-btn" data-id="${esc(c.id)}" aria-pressed="${c.id === selectedId}">
+        ${esc(c.name)}<small>${esc(c.category)} · ${esc(c.city)}</small>
+      </button>`).join("");
+    el.querySelectorAll(".client-btn").forEach(b => b.addEventListener("click", () => selectClient(b.dataset.id)));
+  }
+
+  function chartSvg(runList, changeList) {
+    const W = 720, H = 230, L = 44, R = 20, T = 16, B = 34;
+    const pts = runList.map(r => ({ t: new Date(r.at).getTime(), v: (r.summary || summarize(r.results, currentClient().name)).rate, mode: r.mode }));
+    const times = pts.map(p => p.t).concat(changeList.map(c => new Date(c.date + "T12:00:00").getTime()));
+    if (!pts.length) return `<p class="hint">No checks yet. Run a check now, or wait for Monday's scheduled check.</p>`;
+    let t0 = Math.min(...times), t1 = Math.max(...times);
+    if (t1 - t0 < 864e5 * 7) { t0 -= 864e5 * 4; t1 += 864e5 * 4; }
+    const x = (t) => L + (W - L - R) * (t - t0) / (t1 - t0);
+    const y = (v) => T + (H - T - B) * (1 - v / 100);
+    let g = "";
+    for (const v of [0, 25, 50, 75, 100]) {
+      g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/>`;
+      g += `<text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="11" fill="var(--muted)" font-family="var(--font-mono)">${v}%</text>`;
+    }
+    // x labels: first and last check
+    const first = pts[0], last = pts[pts.length - 1];
+    g += `<text x="${x(first.t)}" y="${H - 10}" text-anchor="start" font-size="11" fill="var(--muted)">${esc(fmtDate(new Date(first.t).toISOString()))}</text>`;
+    if (pts.length > 1) g += `<text x="${x(last.t)}" y="${H - 10}" text-anchor="end" font-size="11" fill="var(--muted)">${esc(fmtDate(new Date(last.t).toISOString()))}</text>`;
+    // change markers
+    changeList.forEach((c, i) => {
+      const cx = x(new Date(c.date + "T12:00:00").getTime());
+      g += `<line x1="${cx}" x2="${cx}" y1="${T}" y2="${H - B}" stroke="var(--warn)" stroke-width="1.5" stroke-dasharray="4 4"><title>${esc(c.date + ": " + c.what)}</title></line>`;
+      g += `<circle cx="${cx}" cy="${T + 8}" r="9" fill="var(--warn-soft)" stroke="var(--warn)"/><text x="${cx}" y="${T + 12}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--warn)" font-family="var(--font-mono)">${i + 1}</text>`;
+    });
+    for (const mode of [NOSEARCH, SEARCH]) {
+      const s = pts.filter(p => p.mode === mode);
+      if (!s.length) continue;
+      const col = mode === SEARCH ? "var(--accent)" : "var(--muted)";
+      const d = s.map((p, i) => `${i ? "L" : "M"}${x(p.t).toFixed(1)} ${y(p.v).toFixed(1)}`).join(" ");
+      if (mode === SEARCH && s.length > 1) {
+        g += `<path d="${d} L${x(s[s.length - 1].t).toFixed(1)} ${y(0)} L${x(s[0].t).toFixed(1)} ${y(0)} Z" fill="var(--accent)" opacity=".08"/>`;
+      }
+      g += `<path d="${d}" fill="none" stroke="${col}" stroke-width="${mode === SEARCH ? 2.5 : 1.5}" ${mode === NOSEARCH ? 'stroke-dasharray="5 4"' : ""}/>`;
+      s.forEach((p, i) => {
+        const end = i === s.length - 1;
+        g += `<circle cx="${x(p.t)}" cy="${y(p.v)}" r="${end ? 5 : 3}" fill="${end ? col : "var(--surface)"}" stroke="${col}" stroke-width="2"><title>${esc(fmtDate(new Date(p.t).toISOString()))}: ${p.v}%</title></circle>`;
+      });
+      const e = s[s.length - 1];
+      g += `<text x="${Math.min(x(e.t) + 8, W - R - 30)}" y="${y(e.v) - 8}" font-size="12" font-weight="600" fill="${col}" font-family="var(--font-mono)">${e.v}%</text>`;
+    }
+    return `<div class="chart-wrap"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mention rate over time">${g}</svg></div>`;
+  }
+
+  function currentClient() {
+    if (dbState !== "ready" || !clients.length) return EXAMPLE.client;
+    return clients.find(c => c.id === selectedId) || clients[0];
+  }
+
+  function render() {
+    renderClientList();
+    const showingExample = dbState !== "ready" || !clients.length;
+    const client = currentClient();
+    const rList = (showingExample ? EXAMPLE.runs : runs).map(r => ({ ...r, summary: r.summary || summarize(r.results || [], client.name) }));
+    const cList = showingExample ? EXAMPLE.changes : changes;
+    const sched = showingExample ? EXAMPLE.schedule : schedule;
+
+    const preferred = rList.some(r => r.mode === SEARCH) ? SEARCH : NOSEARCH;
+    const same = rList.filter(r => r.mode === preferred);
+    const latest = same[same.length - 1], prev = same[same.length - 2];
+    const s = latest ? latest.summary : null;
+    const delta = latest && prev ? s.rate - prev.summary.rate : null;
+    const rateClass = !s ? "" : s.rate >= 60 ? "good" : s.rate >= 30 ? "warn" : "bad";
+    const brand = s && s.brandSentiment;
+    const brandTxt = !brand ? "—" : brand === "unknown" ? "Not known" : brand[0].toUpperCase() + brand.slice(1);
+    const brandClass = !brand ? "" : brand === "positive" ? "good" : brand === "negative" ? "bad" : "warn";
+
+    // question movement vs previous same-mode run
+    const qRows = (latest ? latest.results : (client.questions || [])).map((r, i) => {
+      const before = prev ? prev.results[i] : null;
+      let move = "";
+      if (latest && before && !r.branded) {
+        if (r.mentioned && !before.mentioned) move = `<span class="move delta-up">Gained</span>`;
+        else if (!r.mentioned && before.mentioned) move = `<span class="move delta-down">Lost</span>`;
+        else if (r.mentioned && before.mentioned && Number.isFinite(r.position) && Number.isFinite(before.position) && r.position !== before.position)
+          move = r.position < before.position ? `<span class="move delta-up">Up ${before.position - r.position}</span>` : `<span class="move delta-down">Down ${r.position - before.position}</span>`;
+        else move = `<span class="hint">No change</span>`;
+      }
+      const pill = !latest ? `<span class="pill info">Not checked</span>` :
+        r.branded ? `<span class="pill neutral">${esc(r.sentiment === "unknown" || !r.sentiment ? "Not known" : r.sentiment[0].toUpperCase() + r.sentiment.slice(1))}</span>` :
+        r.mentioned ? `<span class="pill hit">Named${r.position ? " · #" + r.position : ""}</span>` : `<span class="pill miss">Not named</span>`;
+      const named = latest && r.businesses ? (r.businesses.length ? r.businesses.map(esc).join(", ") : "None named") : "";
+      return `<tr>
+        <td>${r.branded ? '<span class="hint">Brand · </span>' : ""}${esc(r.q)}${latest && r.answer ? `<details class="ans"><summary>Read answer</summary><div class="text">${esc(r.answer)}</div></details>` : ""}</td>
+        <td>${pill}</td><td>${move}</td><td class="hint">${named}</td></tr>`;
+    }).join("");
+
+    // sources the AI read (search runs)
+    const srcCounts = new Map();
+    if (latest && latest.mode === SEARCH) for (const r of latest.results) for (const d of (r.sources || [])) srcCounts.set(d, (srcCounts.get(d) || 0) + 1);
+    const srcTop = [...srcCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const site = norm(client.website || "").replace(/ /g, "");
+
+    const sovMax = s ? Math.max(1, ...s.sov.map(([, n]) => n)) : 1;
+
+    $("content").innerHTML = `
+      ${showingExample ? `<div class="banner">Example client with made-up data. ${dbState === "ready" ? "Add a client on the left to start tracking a real business." : "Open this page from Claude while signed in to save real clients."}</div>` : ""}
+      <div class="client-head">
+        <div>
+          <h2 style="font-size:24px">${esc(client.name)}</h2>
+          <p class="meta">${esc(client.category)} · ${esc(client.city)}${client.website ? " · " + esc(client.website) : ""}</p>
+        </div>
+        <div class="row-btns">
+          ${showingExample ? "" : `<button type="button" id="runNow" ${running ? "disabled" : ""}>Run check now</button>
+          <button type="button" class="danger" id="removeBtn">${confirmRemove ? "Click again to remove" : "Remove client"}</button>`}
+        </div>
+      </div>
+      <div class="status" id="runStatus" role="status"></div>
+
+      <div class="tiles">
+        <div class="tile ${rateClass}"><span class="label">Mention rate</span>
+          <span class="value">${s ? s.rate + "%" : "—"}</span>
+          <span class="sub">${s ? `${s.hits} of ${s.total} questions` : "No checks yet"}${delta != null ? ` · <span class="${delta >= 0 ? "delta-up" : "delta-down"}">${delta >= 0 ? "+" : ""}${delta} pts</span>` : ""}</span></div>
+        <div class="tile"><span class="label">Avg position when named</span>
+          <span class="value">${s && s.avgPos != null ? "#" + s.avgPos : "—"}</span>
+          <span class="sub">Lower is better</span></div>
+        <div class="tile ${brandClass}"><span class="label">Asked about directly</span>
+          <span class="value" style="font-size:22px;padding-top:4px">${esc(brandTxt)}</span>
+          <span class="sub">How the AI describes them</span></div>
+        <div class="tile"><span class="label">Last check</span>
+          <span class="value" style="font-size:20px;padding-top:6px">${latest ? esc(fmtDate(latest.at)) : "—"}</span>
+          <span class="sub">${latest ? esc(latest.engine) : ""}${sched && sched.next ? `<br>Next scheduled: ${esc(fmtDate(sched.next))}` : ""}</span></div>
+      </div>
+
+      <div class="panel">
+        <h2>Mention rate over time</h2>
+        <div class="legend">
+          <span><i class="sw"></i>Weekly check, with web search</span>
+          <span><i class="sw dash"></i>Manual check, no web search</span>
+          <span><i class="sw mark"></i>Fix shipped (numbered in the change log)</span>
+        </div>
+        ${chartSvg(rList, cList)}
+      </div>
+
+      <div class="panel">
+        <h2>Question by question</h2>
+        <p class="hint">Latest ${preferred === SEARCH ? "weekly" : "manual"} check compared with the one before it.</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Question</th><th>Result</th><th>Since last check</th><th>Businesses named</th></tr></thead>
+          <tbody>${qRows}</tbody>
+        </table></div>
+      </div>
+
+      <div class="two">
+        <div class="panel">
+          <h2>Share of voice</h2>
+          <p class="hint">Customer questions each business was named in, latest check.</p>
+          <div class="sov">${s ? s.sov.map(([n, c]) => `
+            <div class="sov-row ${n === s.you ? "you" : ""}"><span class="name">${esc(n)}${n === s.you ? " (you)" : ""}</span>
+            <span class="bar"><span style="width:${(100 * c / sovMax).toFixed(1)}%"></span></span><span class="num">${c}/${s.total}</span></div>`).join("") : '<p class="hint">No checks yet.</p>'}</div>
+        </div>
+        <div class="panel">
+          <h2>Sources the AI read</h2>
+          <p class="hint">Sites cited in the latest weekly check. Get the client onto the ones competitors appear on.</p>
+          ${srcTop.length ? `<div class="table-wrap"><table><thead><tr><th>Site</th><th>Questions</th><th></th></tr></thead><tbody>
+            ${srcTop.map(([d, n]) => `<tr><td>${esc(d)}</td><td class="num">${n}</td><td>${site && norm(d).replace(/ /g, "").includes(site) ? '<span class="pill hit">Client site</span>' : ""}</td></tr>`).join("")}
+          </tbody></table></div>` : `<p class="hint">Appears after the first weekly check with web search.</p>`}
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Change log</h2>
+        <p class="hint">Log every fix with its date and the questions it should move. Each one appears as a numbered marker on the chart.</p>
+        <div class="changes">${cList.length ? cList.map((c, i) => `
+          <div class="change"><span class="n">${i + 1}</span><div><p class="when">${esc(c.date)}${c.targets ? " · targets: " + esc(c.targets) : ""}</p><p>${esc(c.what)}</p></div></div>`).join("") : '<p class="hint">No fixes logged yet.</p>'}</div>
+        ${showingExample ? "" : `
+        <form class="inline" id="changeForm" novalidate>
+          <div class="grid2">
+            <label for="chDate">Date<input type="date" id="chDate" value="${new Date().toISOString().slice(0, 10)}"></label>
+            <label for="chWhat">What changed<input id="chWhat" autocomplete="off" placeholder="e.g. Claimed Bing Places and added 12 services"></label>
+          </div>
+          <label for="chTargets">Which questions it should move <small>optional</small><input id="chTargets" autocomplete="off" placeholder="e.g. Affordable, best reviews"></label>
+          <div class="row-btns"><button type="submit" class="ghost">Add to change log</button><span class="hint" id="chStatus"></span></div>
+        </form>`}
+      </div>
+
+      <div class="panel">
+        <h2>Check history</h2>
+        <div class="table-wrap"><table><thead><tr><th>Date</th><th>How</th><th>Mention rate</th><th>Avg position</th></tr></thead><tbody>
+          ${rList.slice().reverse().map(r => `<tr><td>${esc(fmtDate(r.at))}</td><td>${esc(r.engine)}</td><td class="num">${r.summary.rate}% (${r.summary.hits}/${r.summary.total})</td><td class="num">${r.summary.avgPos != null ? "#" + r.summary.avgPos : "—"}</td></tr>`).join("") || `<tr><td colspan="4" class="hint">No checks yet.</td></tr>`}
+        </tbody></table></div>
+      </div>
+
+      <div class="panel method">
+        <h2>How the checks work</h2>
+        <ul>
+          <li>Every client has 8 fixed questions: 7 phrased the way customers ask, plus one that names the business.</li>
+          <li>The weekly check runs every Monday. Claude searches the web for each question, answers it, and records which businesses it named and which sites it cited.</li>
+          <li>"Run check now" asks Claude without web search, so it shows what the model knows on its own. It is plotted as a separate line because the two aren't directly comparable.</li>
+          <li>One check per question per week. AI answers vary, so trust changes that hold for 2–3 weeks rather than a single jump.</li>
+        </ul>
+      </div>`;
+
+    const rn = $("runNow"); if (rn) rn.addEventListener("click", runNow);
+    const rb = $("removeBtn"); if (rb) rb.addEventListener("click", removeClient);
+    const cf = $("changeForm"); if (cf) cf.addEventListener("submit", addChange);
+  }
+
+  // ---------- Data ----------
+  function selectClient(id) {
+    if (selectedId === id && unsubRuns) return;
+    selectedId = id; confirmRemove = false;
+    if (unsubRuns) unsubRuns(); if (unsubChanges) unsubChanges();
+    runs = []; changes = [];
+    render();
+    if (!db || !id) return;
+    unsubRuns = db.collection(`clients/${id}/runs`).orderBy("at", "asc").limit(300).onSnapshot(snap => {
+      runs = snap.docs.map(d => d.data()); render();
+    }, () => {});
+    unsubChanges = db.collection(`clients/${id}/changes`).orderBy("date", "asc").onSnapshot(snap => {
+      changes = snap.docs.map(d => d.data()); render();
+    }, () => {});
+  }
+
+  async function addClient(e) {
+    e.preventDefault();
+    const st = $("addStatus");
+    const name = $("cName").value.trim(), category = $("cCat").value.trim(), city = $("cCity").value.trim(), website = $("cSite").value.trim();
+    if (!name || !category || !city) { st.textContent = "Fill in the name, what they do and the city."; st.classList.add("err"); return; }
+    if (!db) { st.textContent = "Saving clients needs this page opened from Claude while signed in."; st.classList.add("err"); return; }
+    const id = (norm(name).replace(/ /g, "-").slice(0, 40) || "client") + "-" + Math.random().toString(36).slice(2, 7);
+    $("addBtn").disabled = true;
+    try {
+      await db.doc(`clients/${id}`).set({ id, name, category, city, website, questions: buildQuestions(name, category, city), createdAt: new Date().toISOString() });
+      st.classList.remove("err"); st.textContent = `Added ${name}. Run a first check now, or wait for Monday's weekly check.`;
+      $("cName").value = $("cCat").value = $("cCity").value = $("cSite").value = "";
+      selectClient(id);
+    } catch (err) {
+      st.classList.add("err"); st.textContent = err && err.code === "quota_exceeded" ? "The saved data is full. Remove an old client first." : "Couldn't save the client. You may not have edit access to this page.";
+    } finally { $("addBtn").disabled = false; }
+  }
+
+  async function addChange(e) {
+    e.preventDefault();
+    const date = $("chDate").value, what = $("chWhat").value.trim(), targets = $("chTargets").value.trim();
+    if (!date || !what) { $("chStatus").textContent = "Add a date and what changed."; return; }
+    try {
+      await db.collection(`clients/${selectedId}/changes`).add({ date, what, targets, loggedAt: new Date().toISOString() });
+    } catch { $("chStatus").textContent = "Couldn't save the change."; }
+  }
+
+  async function removeClient() {
+    if (!confirmRemove) { confirmRemove = true; render(); setTimeout(() => { if (confirmRemove) { confirmRemove = false; render(); } }, 4000); return; }
+    confirmRemove = false;
+    const id = selectedId;
+    try {
+      await db.doc(`clients/${id}`).delete();
+      selectedId = null; if (unsubRuns) unsubRuns(); if (unsubChanges) unsubChanges(); unsubRuns = unsubChanges = null;
+    } catch { const s = $("runStatus"); if (s) { s.textContent = "Couldn't remove the client."; s.classList.add("err"); } }
+  }
+
+  // ---------- Manual check (Claude, no web search) ----------
+  function friendly(e) {
+    if (e && e.code === "not_granted") return "Claude access wasn't allowed for this page. Allow it when prompted and try again.";
+    if (e && e.code === "rate_limited") return "Too many requests right now. Wait a minute and try again.";
+    return (e && e.message) || "Something went wrong.";
+  }
+  async function pool(tasks, n) { let i = 0; await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, async () => { while (i < tasks.length) await tasks[i++](); })); }
+
+  async function runNow() {
+    const client = currentClient();
+    const say = (m, err) => { const s = $("runStatus"); if (s) { s.textContent = m; s.classList.toggle("err", !!err); } };
+    if (!sample) { say("Manual checks need Claude access, which isn't available in this view. The weekly check still runs.", true); return; }
+    running = true; render(); say("Asking 8 questions… 0 of 8 answered");
+    const results = client.questions.map(q => ({ ...q }));
+    let done = 0, fatal = null;
+    try {
+      await pool(results.map(r => async () => {
+        if (fatal) return;
+        try {
+          const res = await sample(`A person using an AI assistant asks the question below. Answer the way a helpful general-purpose assistant would answer a consumer: name specific businesses if you know them; if unsure, say so. Under 170 words, plain text.\n\nQuestion: ${r.q}`, { cache: false });
+          r.answer = (res && res.text || "").trim();
+        } catch (err) { r.answer = ""; if (err && (err.code === "not_granted" || err.code === "rate_limited")) fatal = err; }
+        done++; say(`Asking 8 questions… ${done} of 8 answered`);
+      }), 3);
+      if (fatal) throw fatal;
+      say("Reading the answers…");
+      const out = await sample.json(
+`For each answer, list the specific businesses it names, in order of first appearance (no platforms like Google or Yelp). Say whether "${client.name}" is named (allow small spelling differences), its 1-based position, and for the answer that is asked about it directly, the tone: "positive", "neutral", "negative" or "unknown" if the answer doesn't know it.
+Return JSON only: {"results":[{"i":0,"businesses":["A"],"target_mentioned":false,"target_position":null,"sentiment":null}]}
+Answers: ${JSON.stringify(results.map((r, i) => ({ i, question: r.q, answer: r.answer })))}`, { cache: false });
+      for (const row of (out && out.results) || []) {
+        const r = results[row.i]; if (!r) continue;
+        r.businesses = Array.isArray(row.businesses) ? row.businesses.map(String).slice(0, 10) : [];
+        const li = r.businesses.findIndex(b => sameBiz(b, client.name));
+        r.mentioned = !!row.target_mentioned || li >= 0;
+        r.position = Number.isFinite(row.target_position) ? row.target_position : (li >= 0 ? li + 1 : null);
+        r.sentiment = r.branded ? (row.sentiment || "unknown") : null;
+      }
+      for (const r of results) if (!r.businesses) { r.businesses = []; r.mentioned = norm(r.answer).includes(norm(client.name)); r.position = null; }
+      for (const r of results) { r.answer = (r.answer || "").slice(0, 700); r.sources = []; }
+      const at = new Date().toISOString();
+      const doc = { at, mode: NOSEARCH, engine: "Claude, no web search", results, summary: summarize(results, client.name) };
+      await db.doc(`clients/${client.id}/runs/${at.replace(/[^0-9]/g, "").slice(0, 14)}-manual`).set(doc);
+      say(`Saved. Mention rate ${doc.summary.rate}% (${doc.summary.hits} of ${doc.summary.total}).`);
+    } catch (err) { say(friendly(err), true); }
+    finally { running = false; render(); }
+  }
+
+  // ---------- Boot ----------
+  render();
+  $("addClient").addEventListener("submit", addClient);
+  if (window.claude && typeof window.claude.use === "function") {
+    window.claude.use("sample").then(s => { sample = s; }).catch(() => {});
+    const timer = setTimeout(() => { if (dbState === "loading") { dbState = "none"; render(); } }, 10000);
+    window.claude.use("db").then(d => {
+      db = d;
+      if (!d) { clearTimeout(timer); dbState = "none"; render(); return; }
+      d.collection("clients").orderBy("name", "asc").onSnapshot(snap => {
+        clearTimeout(timer);
+        clients = snap.docs.map(x => x.data()).filter(c => c && c.id && Array.isArray(c.questions));
+        dbState = "ready";
+        if (!clients.find(c => c.id === selectedId)) { selectedId = null; if (clients[0]) { selectClient(clients[0].id); return; } }
+        render();
+      }, () => { clearTimeout(timer); dbState = "none"; render(); });
+      d.doc("meta/schedule").onSnapshot(snap => { schedule = snap.exists ? snap.data() : null; render(); }, () => {});
+    }).catch(() => { clearTimeout(timer); dbState = "none"; render(); });
+  } else { dbState = "none"; render(); }
+})();
+</script>
+</body>
+</html>
