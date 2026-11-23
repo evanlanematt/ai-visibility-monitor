@@ -2,6 +2,19 @@
 
 Checks every week whether ChatGPT, Claude and Perplexity recommend each client business. It saves every answer, tracks the trend, and shows whether the fixes you shipped moved the numbers.
 
+## Try it in one minute (no API keys)
+
+Requires Python 3.11+. Nothing to install.
+
+```bash
+git clone https://github.com/evanlanematt/ai-visibility-monitor
+cd ai-visibility-monitor
+python3 monitor.py --config config.example.toml run --mock   # first check (fake answers)
+python3 monitor.py --config config.example.toml run --mock   # second check: shows what moved
+```
+
+Then open `report.html`. `--mock` uses made-up assistant answers so the whole pipeline (asking, extracting, scoring, history, report) runs offline. Drop `--mock` and add API keys to check real assistants.
+
 ## What it does on each run
 
 1. Asks each AI assistant, with web search on, 8 fixed questions per client: 7 phrased the way customers ask ("best sign company in Columbus, OH") plus one that names the business. Each customer question runs 3 times, because AI answers vary.
