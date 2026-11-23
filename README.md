@@ -73,4 +73,11 @@ Put keys in a `.env` file next to `run_weekly.sh` if you run it from cron. Never
 
 ## Dashboard (`dashboard/index.html`)
 
-The web dashboard used in the demo: clients, mention-rate trend with logged fixes marked on the chart, question-by-question movement, share of voice and cited sources. It runs as a Claude artifact, where it saves data and asks Claude through Claude's page capabilities. Opened as a plain file it shows the built-in example client only.
+The web app used in the demo. Per client it has four tabs:
+
+- **Results:** mention-rate trend with every finished fix marked on the chart, question-by-question movement, share of voice, and the sites the AI cited.
+- **Fix plan:** business facts from the intake call, plus 18 tasks across listings, website, reviews, content, links and tracking, split between agency and owner. Setting a task to Done logs it on the chart.
+- **Assets:** ready-to-paste Google profile and listing copy, website pages, review requests (written only from the owner's facts), and LocalBusiness schema built directly from those facts.
+- **Links:** a link-building pipeline with targets (sites the AI cites, local suggestions, weekly research), status, follow-up dates, and a written pitch for each.
+
+A "How it works" view explains the loop and what the tool and the owner each do. The page runs as a Claude artifact, where it saves data and asks Claude through Claude's page capabilities. Opened as a plain file it shows the built-in example client only.

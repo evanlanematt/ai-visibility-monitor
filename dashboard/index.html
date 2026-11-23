@@ -114,12 +114,86 @@ details.ans summary { cursor: pointer; color: var(--accent); font-size: 13px; }
 details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg); border-radius: 6px; padding: 8px 10px; margin-top: 6px; max-height: 220px; overflow: auto; }
 .method { font-size: 14px; color: var(--muted); }
 .method ul { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 4px; }
+[hidden] { display: none !important; }
+/* ---- view nav, tabs, workspace ---- */
+.viewnav { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.viewnav a { font-weight: 600; font-size: 14px; color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
+.viewnav a[aria-current="page"] { color: #fff; background: var(--accent); border-color: var(--accent); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tabs button { background: transparent; color: var(--muted); border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 8px 12px; }
+.tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.tabs .count { font-family: var(--font-mono); font-size: 12px; margin-left: 4px; }
+.grid2f { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+@media (max-width: 640px) { .grid2f { grid-template-columns: 1fr; } }
+select { font: inherit; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--bg); color: var(--ink); }
+.area-h { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.area-h .bar { flex: 1; height: 6px; border-radius: 3px; background: var(--bg); border: 1px solid var(--line); overflow: hidden; }
+.area-h .bar span { display: block; height: 100%; background: var(--good); }
+.task { display: grid; grid-template-columns: 130px 1fr auto; gap: 10px; align-items: start; padding: 9px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 640px) { .task { grid-template-columns: 1fr; } }
+.task.done .t-title { text-decoration: line-through; color: var(--muted); }
+.t-title { font-weight: 600; font-size: 15px; } .t-how { font-size: 13px; color: var(--muted); }
+.owner { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.owner.agency { background: var(--accent-soft); color: var(--accent); } .owner.client { background: var(--warn-soft); color: var(--warn); }
+.kit { border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 10px; }
+.kit-head { display: flex; justify-content: space-between; gap: 10px; align-items: start; flex-wrap: wrap; }
+.sec { border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 6px; }
+.sec-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.sec-body, pre.code { white-space: pre-wrap; font-size: 14px; background: var(--bg); border-radius: 7px; padding: 10px 12px; margin: 0; overflow-x: auto; }
+pre.code { font-family: var(--font-mono); font-size: 12.5px; white-space: pre; }
+button.small { padding: 5px 10px; font-size: 13px; }
+.lk-name { font-weight: 600; } .lk-meta { font-size: 12px; color: var(--muted); }
+.verify { font-size: 11px; font-weight: 700; color: var(--warn); text-transform: uppercase; letter-spacing: .04em; }
+.pipeline { display: flex; gap: 8px; flex-wrap: wrap; }
+.pipeline span { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); }
+.pipeline b { font-family: var(--font-mono); }
+/* ---- How it works ---- */
+#howView { max-width: 1120px; margin: 0 auto; padding: 8px 20px 64px; display: grid; gap: 28px; }
+.how-hero { display: grid; gap: 8px; }
+.how-hero h2 { font-size: 30px; font-weight: 800; letter-spacing: -0.01em; max-width: 26ch; }
+.how-hero p { color: var(--muted); max-width: 68ch; font-size: 17px; }
+.diagram { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 720px; height: auto; }
+.d-card { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+.d-card.hot { fill: var(--accent-soft); stroke: var(--accent); }
+.d-num { fill: var(--accent); } .d-numt { fill: #fff; font: 700 15px var(--font-mono); }
+.d-title { fill: var(--ink); font: 700 18px var(--font-display); }
+.d-sub { fill: var(--muted); font: 400 13.5px var(--font-body); }
+.d-ico { fill: none; stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.d-ico-fill { fill: var(--accent); }
+.d-arrow { fill: none; stroke: var(--muted); stroke-width: 2; }
+.d-loop { fill: none; stroke: var(--accent); stroke-width: 2; stroke-dasharray: 6 6; }
+.d-loopt { fill: var(--accent); font: 600 13px var(--font-body); }
+.d-chip { fill: var(--bg); stroke: var(--line); }
+.d-chipt { fill: var(--ink); font: 600 13.5px var(--font-body); }
+.d-chipn { fill: var(--accent); font: 700 12px var(--font-mono); }
+.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 820px) { .tracks { grid-template-columns: 1fr; } }
+.track { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 10px; align-content: start; }
+.track-h { display: flex; gap: 12px; align-items: center; }
+.track-n { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font: 700 15px var(--font-mono); flex: none; }
+.track h3 { font-size: 19px; }
+.track .lead { color: var(--ink); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 560px) { .cols { grid-template-columns: 1fr; } }
+.cols h4 { margin: 0 0 4px; font: 700 12px var(--font-body); text-transform: uppercase; letter-spacing: .05em; }
+.cols .tool h4 { color: var(--accent); } .cols .you h4 { color: var(--warn); }
+.cols ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+.where { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+.rules { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--good); border-radius: 0 12px 12px 0; padding: 18px; display: grid; gap: 8px; }
+.rules ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.steps-auth { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 760px) { .steps-auth { grid-template-columns: 1fr; } }
+.steps-auth div { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 4px; }
+.steps-auth b { font-family: var(--font-display); font-size: 16px; }
+.steps-auth span { font-size: 14px; color: var(--muted); }
 </style>
 </head>
 <body>
 <header class="top">
   <h1>AI Visibility Monitor</h1>
-  <p>Tracks whether AI assistants recommend each client, week over week. Every check is saved, fixes are logged on the timeline, and a scheduled check re-runs the same questions with live web search every Monday.</p>
+  <p>Tracks whether AI assistants recommend each client, week over week, and works through the fixes: listings, website, reviews, content and links. Every finished fix is marked on the trend chart.</p>
+  <nav class="viewnav" aria-label="Views"><a href="#monitor">Dashboard</a><a href="#how">How it works</a></nav>
 </header>
 
 <main>
@@ -142,6 +216,156 @@ details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg
 
   <section class="content" id="content" aria-live="polite"></section>
 </main>
+
+<section id="howView" hidden aria-labelledby="howTitle">
+  <div class="how-hero">
+    <h2 id="howTitle">How the AI Visibility Monitor gets a business recommended</h2>
+    <p>Every week it asks AI assistants the questions real customers ask, finds out who gets recommended instead and why, works through the fixes, and proves what moved.</p>
+  </div>
+
+  <div class="diagram" role="img" aria-label="A loop of four steps: ask the AIs, find the gap, fix it across six areas, and prove it, repeating every Monday.">
+    <svg viewBox="0 0 1000 300" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--muted)"/></marker>
+        <marker id="ahA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1L9 5L1 9z" fill="var(--accent)"/></marker>
+      </defs>
+      <path class="d-loop" d="M880 48 V26 H130 V44" marker-end="url(#ahA)"/>
+      <text class="d-loopt" x="505" y="16" text-anchor="middle">Repeats every Monday</text>
+
+      <!-- 1 Ask -->
+      <rect class="d-card" x="30" y="50" width="200" height="150" rx="14"/>
+      <circle class="d-num" cx="56" cy="76" r="14"/><text class="d-numt" x="56" y="81" text-anchor="middle">1</text>
+      <rect class="d-ico" x="176" y="64" width="34" height="24" rx="6"/><path class="d-ico" d="M184 88 l-3 9 l11 -9"/>
+      <circle class="d-ico-fill" cx="185" cy="76" r="2.2"/><circle class="d-ico-fill" cx="193" cy="76" r="2.2"/><circle class="d-ico-fill" cx="201" cy="76" r="2.2"/>
+      <text class="d-title" x="50" y="136">Ask the AIs</text>
+      <text class="d-sub" x="50" y="160">The questions customers ask,</text>
+      <text class="d-sub" x="50" y="178">with live web search</text>
+
+      <path class="d-arrow" d="M236 125 H272" marker-end="url(#ah)"/>
+
+      <!-- 2 Gap -->
+      <rect class="d-card" x="280" y="50" width="200" height="150" rx="14"/>
+      <circle class="d-num" cx="306" cy="76" r="14"/><text class="d-numt" x="306" y="81" text-anchor="middle">2</text>
+      <path class="d-ico" d="M424 98 H462"/>
+      <rect class="d-ico" x="428" y="78" width="7" height="20" rx="1.5"/><rect class="d-ico" x="440" y="66" width="7" height="32" rx="1.5"/><rect class="d-ico-fill" x="452" y="88" width="7" height="10" rx="1.5"/>
+      <text class="d-title" x="300" y="136">Find the gap</text>
+      <text class="d-sub" x="300" y="160">Who gets named instead,</text>
+      <text class="d-sub" x="300" y="178">and which sites the AI read</text>
+
+      <path class="d-arrow" d="M486 125 H522" marker-end="url(#ah)"/>
+
+      <!-- 3 Fix -->
+      <rect class="d-card hot" x="530" y="50" width="200" height="150" rx="14"/>
+      <circle class="d-num" cx="556" cy="76" r="14"/><text class="d-numt" x="556" y="81" text-anchor="middle">3</text>
+      <path class="d-ico" d="M676 68 l3 3 l5 -6 M676 80 l3 3 l5 -6 M676 92 l3 3 l5 -6 M690 69 H712 M690 81 H712 M690 93 H706"/>
+      <text class="d-title" x="550" y="136">Fix it</text>
+      <text class="d-sub" x="550" y="160">Six fix areas, split between</text>
+      <text class="d-sub" x="550" y="178">the tool and the owner</text>
+
+      <path class="d-arrow" d="M736 125 H772" marker-end="url(#ah)"/>
+
+      <!-- 4 Prove -->
+      <rect class="d-card" x="780" y="50" width="200" height="150" rx="14"/>
+      <circle class="d-num" cx="806" cy="76" r="14"/><text class="d-numt" x="806" y="81" text-anchor="middle">4</text>
+      <polyline class="d-ico" points="926,96 936,86 944,90 958,70"/><circle class="d-ico-fill" cx="958" cy="70" r="3.5"/>
+      <text class="d-title" x="800" y="136">Prove it</text>
+      <text class="d-sub" x="800" y="160">Re-check and mark every fix</text>
+      <text class="d-sub" x="800" y="178">on the trend chart</text>
+
+      <!-- fix areas -->
+      <path class="d-arrow" d="M630 200 V232 M114 232 H874 M114 232 V248 M266 232 V248 M418 232 V248 M570 232 V248 M722 232 V248 M874 232 V248"/>
+      <g>
+        <rect class="d-chip" x="44" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="74" y="275">1</text><text class="d-chipt" x="86" y="275">Listings</text>
+        <rect class="d-chip" x="196" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="226" y="275">2</text><text class="d-chipt" x="238" y="275">Website</text>
+        <rect class="d-chip" x="348" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="378" y="275">3</text><text class="d-chipt" x="390" y="275">Reviews</text>
+        <rect class="d-chip" x="500" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="530" y="275">4</text><text class="d-chipt" x="542" y="275">Content</text>
+        <rect class="d-chip" x="652" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="682" y="275">5</text><text class="d-chipt" x="694" y="275">Links</text>
+        <rect class="d-chip" x="804" y="250" width="140" height="40" rx="20"/><text class="d-chipn" x="834" y="275">6</text><text class="d-chipt" x="846" y="275">Tracking</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="how-hero">
+    <h2 style="font-size:24px">What happens once a client says yes</h2>
+  </div>
+  <div class="steps-auth">
+    <div><b>1. The owner gives access</b><span>A 30-minute intake call: manager access to their Google profile, a website login, and their real services, prices and story. Entered once in Fix plan › Business facts.</span></div>
+    <div><b>2. The tool does the work</b><span>It builds the fix plan, writes every profile, page, schema block, review request and outreach pitch from the owner's real facts, and tracks each task.</span></div>
+    <div><b>3. The owner does their part</b><span>Only what has to come from the business: verification codes, asking customers for reviews, and local relationships. Each is a task with clear instructions.</span></div>
+  </div>
+
+  <div class="how-hero">
+    <h2 style="font-size:24px">The six fix areas</h2>
+    <p>Each area maps to a part of the tool. Tasks marked done are added to the trend chart automatically, so you can see which fix moved the numbers.</p>
+  </div>
+  <div class="tracks">
+    <article class="track">
+      <div class="track-h"><span class="track-n">1</span><h3>Listings</h3></div>
+      <p class="lead">AI assistants with search pull local businesses from listing data first: Google, Bing, Apple and booking sites like Fresha.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Writes the Google profile: description, categories, services, Q&amp;A, first posts</li><li>Writes matching Bing, Apple and booking-site copy (with French versions in Quebec)</li><li>Flags which booking sites the AI cites in your area</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Claims and verifies each listing (codes go to the business)</li><li>Adds the agency as a manager</li></ul></div>
+      </div>
+      <p class="where">In the tool: Assets › Google profile &amp; listings, Fix plan › Listings</p>
+    </article>
+    <article class="track">
+      <div class="track-h"><span class="track-n">2</span><h3>Website</h3></div>
+      <p class="lead">The website is where AI checks what the business actually does, so every page should be clear, specific and quotable.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Drafts a page per service with prices, plus an FAQ page and titles</li><li>Generates LocalBusiness schema from the owner's facts</li><li>Checklist for crawler access and speed</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Confirms prices and details</li><li>Gives a website login, or approves a simple new site</li></ul></div>
+      </div>
+      <p class="where">In the tool: Assets › Website pages, Assets › Schema markup</p>
+    </article>
+    <article class="track">
+      <div class="track-h"><span class="track-n">3</span><h3>Reviews</h3></div>
+      <p class="lead">Reviews decide who gets named for "best" and "top-rated" questions: how many, how recent, and what they mention.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Writes the text and email asks, follow-up and staff script</li><li>Writes reply templates for good and bad reviews</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Sends the ask after each visit, to real customers only</li><li>No incentives, no fake reviews</li></ul></div>
+      </div>
+      <p class="where">In the tool: Assets › Review requests</p>
+    </article>
+    <article class="track">
+      <div class="track-h"><span class="track-n">4</span><h3>Content</h3></div>
+      <p class="lead">Every question where the business was missing becomes a page that answers it directly, with details only this business has.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Turns missed questions into pages: answer first, real prices and details</li><li>Keeps them few and specific, never mass-produced</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Shares real details and photos in the intake</li><li>Approves before anything is published</li></ul></div>
+      </div>
+      <p class="where">In the tool: Fix plan › Content, Results › Question by question</p>
+    </article>
+    <article class="track">
+      <div class="track-h"><span class="track-n">5</span><h3>Links</h3></div>
+      <p class="lead">Other trusted sites mentioning the business is what moves it from "known" to "recommended". These links have to be earned, never bought.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Finds targets: sites the AI cites, local associations, roundups, partners</li><li>Writes a personal pitch for each, tracks status and follow-up dates</li><li>Weekly research adds new real targets</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Joins the local association, sponsors, builds partner relationships</li><li>Approves pitches sent in their name</li></ul></div>
+      </div>
+      <p class="where">In the tool: Links</p>
+    </article>
+    <article class="track">
+      <div class="track-h"><span class="track-n">6</span><h3>Tracking</h3></div>
+      <p class="lead">The same questions every week, so the trend is real. Every completed fix is marked on the chart.</p>
+      <div class="cols">
+        <div class="tool"><h4>The tool does</h4><ul><li>Re-asks every question each Monday with live web search</li><li>Shows mention rate, position, share of voice and cited sites</li><li>Marks each finished task on the trend chart</li></ul></div>
+        <div class="you"><h4>The owner does</h4><ul><li>Nothing. It runs on its own.</li></ul></div>
+      </div>
+      <p class="where">In the tool: Results</p>
+    </article>
+  </div>
+
+  <div class="rules">
+    <h2>Rules the tool follows</h2>
+    <ul>
+      <li>Everything is written from the owner's real facts. Missing facts are marked [ADD: …], never invented.</li>
+      <li>No fake reviews, no incentives for reviews, no bought links, no mass-produced AI pages.</li>
+      <li>Anything published or sent in the owner's name is approved by the owner first.</li>
+      <li>No one can guarantee what an AI recommends. The tool promises the work and proves the results.</li>
+    </ul>
+  </div>
+</section>
+
 
 <script>
 (() => {
@@ -342,7 +566,7 @@ details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg
 
     const sovMax = s ? Math.max(1, ...s.sov.map(([, n]) => n)) : 1;
 
-    $("content").innerHTML = `
+    const headHtml = `
       ${showingExample ? `<div class="banner">Example client with made-up data. ${dbState === "ready" ? "Add a client on the left to start tracking a real business." : "Open this page from Claude while signed in to save real clients."}</div>` : ""}
       <div class="client-head">
         <div>
@@ -354,8 +578,8 @@ details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg
           <button type="button" class="danger" id="removeBtn">${confirmRemove ? "Click again to remove" : "Remove client"}</button>`}
         </div>
       </div>
-      <div class="status" id="runStatus" role="status"></div>
-
+      <div class="status" id="runStatus" role="status"></div>`;
+    const resultsBody = `
       <div class="tiles">
         <div class="tile ${rateClass}"><span class="label">Mention rate</span>
           <span class="value">${s ? s.rate + "%" : "—"}</span>
@@ -439,10 +663,383 @@ details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg
           <li>One check per question per week. AI answers vary, so trust changes that hold for 2–3 weeks rather than a single jump.</li>
         </ul>
       </div>`;
+    const keep = captureKeep();
+    $("content").innerHTML = headHtml + tabsBar(showingExample) + (showingExample || clientTab === "results" ? resultsBody : renderWorkTab(client));
+    restoreKeep(keep);
 
     const rn = $("runNow"); if (rn) rn.addEventListener("click", runNow);
     const rb = $("removeBtn"); if (rb) rb.addEventListener("click", removeClient);
     const cf = $("changeForm"); if (cf) cf.addEventListener("submit", addChange);
+  }
+
+  // ---------- Fix workspace ----------
+  let clientTab = "results";
+  let tasks = [], assets = {}, links = [];
+  let unsubWork = [];
+  let genBusy = null;
+  const copyMap = {};
+  const today = () => new Date().toISOString().slice(0, 10);
+  const isQuebec = (c) => /\b(QC|Qu[eé]bec)\b/i.test(c.city || "");
+
+  const AREAS = ["Listings", "Website", "Reviews", "Content", "Links", "Tracking"];
+  const TASK_TEMPLATE = [
+    { id: "L1", area: "Listings", owner: "Client", title: "Claim and verify the Google Business Profile", how: "Google sends the code to the business. Then add the agency as a manager.", done: (i) => i.gbp === "yes" },
+    { id: "L2", area: "Listings", owner: "Agency", title: "Complete the Google profile: categories, services, hours, description, Q&A", how: "Paste from Assets › Google profile & listings." },
+    { id: "L3", area: "Listings", owner: "Client", title: "Claim Bing Places (import from Google)", how: "ChatGPT's local answers lean on Bing. About 10 minutes once Google is verified.", done: (i) => i.bing === "yes" },
+    { id: "L4", area: "Listings", owner: "Client", title: "Claim Apple Business Connect", how: "Feeds Siri and Apple Maps." },
+    { id: "L5", area: "Listings", owner: "Client", title: "Get listed on the booking sites the AI cites", how: "See Results › Sources the AI read. In the West Island tests, every answer drew on Fresha.", done: (i) => i.fresha === "yes" },
+    { id: "L6", area: "Listings", owner: "Agency", title: "Make name, address and phone identical everywhere", how: "Fix old or mismatched listings found in search." },
+    { id: "W1", area: "Website", owner: "Agency", title: "Make sure the business has a website, even one page", how: "Build it from Assets › Website pages if there is none.", done: (i, c) => !!(c.website || i.website) },
+    { id: "W2", area: "Website", owner: "Agency", title: "One page per main service, with prices", how: "Drafts in Assets › Website pages. The owner confirms prices." },
+    { id: "W3", area: "Website", owner: "Agency", title: "Add LocalBusiness schema to the site", how: "Code in Assets › Schema markup." },
+    { id: "W4", area: "Website", owner: "Agency", title: "Add an FAQ page that answers customer questions", how: "Drafts in Assets › Website pages." },
+    { id: "W5", area: "Website", owner: "Agency", title: "Check robots.txt doesn't block search or AI crawlers", how: "Googlebot, Bingbot, OAI-SearchBot, PerplexityBot must be allowed." },
+    { id: "R1", area: "Reviews", owner: "Client", title: "Ask every happy customer for a review, same day", how: "Texts and emails in Assets › Review requests. Real customers only, no incentives." },
+    { id: "R2", area: "Reviews", owner: "Agency", title: "Reply to every review within 48 hours", how: "Reply templates in Assets › Review requests." },
+    { id: "C1", area: "Content", owner: "Agency", title: "Publish a page for each question where the business was missing", how: "Answer first, with the owner's real prices and details. A few good pages, not many thin ones." },
+    { id: "K1", area: "Links", owner: "Client", title: "Join the local business association or chamber", how: "Member directories link to members' websites." },
+    { id: "K2", area: "Links", owner: "Agency", title: "Pitch 5 targets from the Links tab", how: "Booking sites the AI cites, local roundups, partners." },
+    { id: "K3", area: "Links", owner: "Client", title: "Earn one community link: sponsorship, partner or supplier listing", how: "Real relationships. Disclosed sponsorships are fine." },
+    { id: "T1", area: "Tracking", owner: "Agency", title: "Weekly AI check running", how: "Runs every Monday on its own.", done: () => true }
+  ];
+
+  const KITS = [
+    { key: "profile", title: "Google profile & listings", desc: "Description, categories, services, Q&A, first posts, and matching Bing, Apple and booking-site copy." },
+    { key: "website", title: "Website pages", desc: "Homepage copy, a page per main service with title and meta description, and an FAQ page." },
+    { key: "reviews", title: "Review requests", desc: "Text and email asks, follow-up, staff script, and reply templates." }
+  ];
+
+  const LINK_STATUS = ["To research", "Ready to pitch", "Pitched", "Followed up", "Live", "Not a fit"];
+
+  function parseServices(txt) {
+    return String(txt || "").split("\n").map(l => l.trim()).filter(Boolean).map(l => {
+      const [name, price, dur] = l.split("|").map(s => (s || "").trim());
+      return { name, price, dur };
+    }).filter(s => s.name);
+  }
+
+  function factsText(c) {
+    const i = c.intake || {};
+    const lines = [
+      `Business name: ${c.name}`, `What they do: ${c.category}`, `Area: ${c.city}`,
+      (c.website || i.website) && `Website: ${c.website || i.website}`,
+      i.address && `Address: ${i.address}`, i.phone && `Phone: ${i.phone}`,
+      i.hours && `Hours: ${i.hours.replace(/\n/g, "; ")}`,
+      i.services && `Services (name | price | duration):\n${i.services}`,
+      i.about && `About the business, in the owner's words: ${i.about}`,
+      i.years && `Years in business: ${i.years}`, i.booking && `Booking link: ${i.booking}`,
+      i.languages && `Languages spoken: ${i.languages}`,
+      i.reviews && `Google reviews: ${i.reviews}${i.rating ? " at " + i.rating + " stars" : ""}`
+    ];
+    return lines.filter(Boolean).join("\n");
+  }
+
+  const FACT_RULES = `Rules: use only the facts above. Where a needed fact is missing, write [ADD: what's missing]. Never invent prices, years, awards, staff names, reviews or quotes. Plain text; no markdown symbols like # or **.`;
+
+  function kitPrompt(key, c) {
+    const fr = isQuebec(c) ? " Because the business is in Quebec, add French versions of the customer-facing text in a final section." : "";
+    const ask = {
+      profile: `Write a listings kit. Sections, in order: "Google Business Profile description" (max 750 characters, lead with the main service and area); "Google categories" (one primary, up to four secondary, using real Google category names); "Services" (one per line: name, one-sentence description, price if known); "Q&A to post" (5 questions customers ask, each with an answer); "First 3 Google posts" (each under 300 characters); "Bing, Apple and booking-site description" (under 300 characters).${fr}`,
+      website: `Write website copy. Sections: "Homepage" (title tag under 60 characters, meta description under 155, H1, a 120-word intro); then one section per main service, up to 5, titled "Service page: <name>" (title tag, meta description, H1, 150 to 200 words, 3 FAQs); then "FAQ page" (8 questions and answers customers actually ask).${fr}`,
+      reviews: `Write a review-request kit. Sections: "Text message ask" (under 300 characters, include [REVIEW LINK]); "Email ask"; "Follow-up 3 days later"; "Staff script" (one or two sentences said at checkout); "Reply to a 5-star review"; "Reply to a mixed review"; "Reply to a negative review". Ask customers to mention the service and the town. Never offer anything in exchange for a review.${fr}`
+    }[key];
+    return `You are a local SEO specialist preparing ready-to-paste material for a small business.\n\nFacts:\n${factsText(c)}\n\n${ask}\n\n${FACT_RULES}\n\nReturn JSON only: {"sections":[{"title":"...","body":"..."}]}`;
+  }
+
+  function schemaFor(c) {
+    const i = c.intake || {};
+    const cat = c.category || "";
+    const type = /nail/i.test(cat) ? "NailSalon" : /hair|barber/i.test(cat) ? "HairSalon" : /beauty|spa|lash|brow/i.test(cat) ? "BeautySalon" : /dent/i.test(cat) ? "Dentist" : /plumb/i.test(cat) ? "Plumber" : /restaurant|cafe|café/i.test(cat) ? "Restaurant" : "LocalBusiness";
+    const [locality, region] = (c.city || "").split(",").map(s => (s || "").trim());
+    const site = c.website || i.website;
+    const o = { "@context": "https://schema.org", "@type": type, name: c.name };
+    if (site) o.url = /^https?:\/\//.test(site) ? site : "https://" + site;
+    if (i.phone) o.telephone = i.phone;
+    o.address = { "@type": "PostalAddress", ...(i.address ? { streetAddress: i.address } : {}), addressLocality: locality, ...(region ? { addressRegion: region } : {}), addressCountry: isQuebec(c) ? "CA" : undefined };
+    if (!o.address.addressCountry) delete o.address.addressCountry;
+    if (i.hours) o.openingHours = i.hours.split(/\n|;/).map(s => s.trim()).filter(Boolean);
+    o.areaServed = c.city;
+    const svcs = parseServices(i.services);
+    if (svcs.length) o.makesOffer = svcs.map(s => {
+      const off = { "@type": "Offer", itemOffered: { "@type": "Service", name: s.name } };
+      const n = (s.price || "").replace(/[^0-9.]/g, "");
+      if (n) { off.price = n; off.priceCurrency = isQuebec(c) ? "CAD" : "USD"; }
+      return off;
+    });
+    return `<script type="application/ld+json">\n${JSON.stringify(o, null, 2)}\n<\/script>`;
+  }
+
+  function tabsBar(showingExample) {
+    if (showingExample) return "";
+    const open = tasks.filter(t => t.status !== "Done").length;
+    const T = (k, label, extra = "") => `<button type="button" role="tab" data-act="tab" data-tab="${k}" aria-selected="${clientTab === k}">${label}${extra}</button>`;
+    return `<div class="tabs" role="tablist">
+      ${T("results", "Results")}
+      ${T("plan", "Fix plan", tasks.length ? `<span class="count">${open} open</span>` : "")}
+      ${T("assets", "Assets")}
+      ${T("links", "Links", links.length ? `<span class="count">${links.length}</span>` : "")}
+    </div>`;
+  }
+
+  function intakeForm(c) {
+    const i = c.intake || {};
+    const v = (k) => esc(i[k] || "");
+    const sel = (k, label) => `<label for="in_${k}">${label}<select id="in_${k}" class="keep">
+      ${["unsure", "yes", "no"].map(o => `<option value="${o}" ${(i[k] || "unsure") === o ? "selected" : ""}>${o === "unsure" ? "Not sure" : o === "yes" ? "Yes" : "No"}</option>`).join("")}</select></label>`;
+    return `<details class="panel" ${c.intake ? "" : "open"}>
+      <summary><h2 style="display:inline">Business facts</h2> <span class="hint">${c.intake ? "Saved. Everything the tool writes uses only these facts." : "Fill these in from the intake call. The tool writes only from these facts."}</span></summary>
+      <form class="inline" id="intakeForm" novalidate style="margin-top:10px">
+        <div class="grid2f">
+          <label for="in_phone">Phone<input id="in_phone" class="keep" value="${v("phone")}" autocomplete="off"></label>
+          <label for="in_address">Street address<input id="in_address" class="keep" value="${v("address")}" autocomplete="off"></label>
+          <label for="in_hours">Hours <small>one per line, like Mo-Fr 10:00-19:00</small><textarea id="in_hours" class="keep" rows="3">${v("hours")}</textarea></label>
+          <label for="in_services">Services <small>one per line: name | price | duration</small><textarea id="in_services" class="keep" rows="3">${v("services")}</textarea></label>
+          <label for="in_about" style="grid-column:1/-1">About the business <small>owner's words: story, specialties, what customers love</small><textarea id="in_about" class="keep" rows="3">${v("about")}</textarea></label>
+          <label for="in_years">Years in business<input id="in_years" class="keep" value="${v("years")}" autocomplete="off"></label>
+          <label for="in_booking">Booking link<input id="in_booking" class="keep" value="${v("booking")}" autocomplete="off"></label>
+          <label for="in_languages">Languages spoken<input id="in_languages" class="keep" value="${v("languages")}" autocomplete="off" placeholder="English, French"></label>
+          <label for="in_reviews">Google reviews <small>count and rating</small><span style="display:flex;gap:8px"><input id="in_reviews" class="keep" value="${v("reviews")}" style="width:50%" placeholder="24"><input id="in_rating" class="keep" value="${v("rating")}" style="width:50%" placeholder="5.0"></span></label>
+          ${sel("gbp", "Google profile claimed?")}
+          ${sel("bing", "Bing Places claimed?")}
+          ${sel("fresha", "On the booking sites the AI cites?")}
+        </div>
+        <div class="row-btns"><button type="submit">Save business facts</button><span class="hint" id="intakeStatus"></span></div>
+      </form>
+    </details>`;
+  }
+
+  function planTab(c) {
+    let body;
+    if (!tasks.length) {
+      body = `<div class="panel"><h2>Fix plan</h2><p class="hint">Creates ${TASK_TEMPLATE.length} tasks across the six fix areas, split between the agency and the owner. Anything the facts show is already done gets marked done.</p>
+        <div class="row-btns"><button type="button" data-act="plan-create">Create fix plan</button></div></div>`;
+    } else {
+      const doneN = tasks.filter(t => t.status === "Done").length;
+      const groups = AREAS.map(a => {
+        const ts = tasks.filter(t => t.area === a).sort((x, y) => (x.order || 0) - (y.order || 0));
+        if (!ts.length) return "";
+        const d = ts.filter(t => t.status === "Done").length;
+        return `<div class="area-h"><h3>${a}</h3><span class="bar"><span style="width:${(100 * d / ts.length).toFixed(0)}%"></span></span><span class="hint num">${d}/${ts.length}</span></div>
+        ${ts.map(t => `<div class="task ${t.status === "Done" ? "done" : ""}">
+          <select data-act="task-status" data-id="${esc(t.id)}" aria-label="Status for ${esc(t.title)}">${["To do", "In progress", "Done"].map(s => `<option ${t.status === s ? "selected" : ""}>${s}</option>`).join("")}</select>
+          <div><div class="t-title">${esc(t.title)}</div><div class="t-how">${esc(t.how || "")}${t.note ? " · " + esc(t.note) : ""}</div></div>
+          <span class="owner ${t.owner === "Client" ? "client" : "agency"}">${t.owner === "Client" ? "Owner" : "Agency"}</span>
+        </div>`).join("")}`;
+      }).join("");
+      body = `<div class="panel"><div class="kit-head"><div><h2>Fix plan</h2><p class="hint">${doneN} of ${tasks.length} done. Setting a task to Done adds it to the change log and marks it on the Results chart.</p></div></div>${groups}</div>`;
+    }
+    return intakeForm(c) + body;
+  }
+
+  function assetsTab(c) {
+    const ready = !!(c.intake && (c.intake.services || c.intake.about));
+    const kits = KITS.map(k => {
+      const a = assets[k.key];
+      const busy = genBusy === k.key;
+      const secs = a && Array.isArray(a.sections) ? a.sections.map((s, n) => {
+        const id = `${k.key}-${n}`; copyMap[id] = s.body || "";
+        return `<div class="sec"><div class="sec-head"><h3>${esc(s.title)}</h3><button type="button" class="ghost small" data-act="copy" data-copy="${id}">Copy</button></div><div class="sec-body">${esc(s.body)}</div></div>`;
+      }).join("") : "";
+      return `<div class="kit"><div class="kit-head"><div><h3>${esc(k.title)}</h3><p class="hint">${esc(k.desc)}</p>${a ? `<p class="hint">Written ${esc(fmtDate(a.generatedAt))}. Check every [ADD: …] before publishing.</p>` : ""}</div>
+        <button type="button" data-act="gen" data-kit="${k.key}" ${busy || genBusy ? "disabled" : ""}>${busy ? "Writing…" : a ? "Rewrite" : "Write it"}</button></div>${secs}</div>`;
+    }).join("");
+    copyMap.schema = schemaFor(c);
+    return `${ready ? "" : `<div class="banner">Fill in Fix plan › Business facts first. Without them, the kits come back full of [ADD: …] placeholders.</div>`}
+      <div class="status" id="genStatus" role="status"></div>
+      <div class="panel">${kits}
+        <div class="kit"><div class="kit-head"><div><h3>Schema markup</h3><p class="hint">Built directly from the business facts, nothing written by AI. Paste into the site's &lt;head&gt;, then test it with Google's Rich Results Test.</p></div><button type="button" class="ghost" data-act="copy" data-copy="schema">Copy</button></div>
+        <pre class="code">${esc(copyMap.schema)}</pre></div>
+      </div>`;
+  }
+
+  function linksTab(c) {
+    const counts = LINK_STATUS.map(s => [s, links.filter(l => (l.status || "To research") === s).length]);
+    const rows = links.slice().sort((a, b) => LINK_STATUS.indexOf(a.status) - LINK_STATUS.indexOf(b.status)).map(l => {
+      const pid = `pitch-${l._id}`;
+      if (l.pitch) copyMap[pid] = `Subject: ${l.pitch.subject}\n\n${l.pitch.body}`;
+      return `<tr>
+        <td><div class="lk-name">${l.url ? `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.name)}</a>` : esc(l.name)}</div>
+          <div class="lk-meta">${esc(l.type || "")}${l.source === "claude" ? ` · <span class="verify">Suggested, verify it exists</span>` : l.source === "research" ? " · Found by weekly research" : l.source === "cited" ? " · Cited by AI answers" : ""}</div>
+          ${l.why ? `<div class="lk-meta">${esc(l.why)}</div>` : ""}
+          ${l.pitch ? `<details class="ans"><summary>Pitch: ${esc(l.pitch.subject)}</summary><div class="text">${esc(l.pitch.body)}</div><button type="button" class="ghost small" data-act="copy" data-copy="${pid}" style="margin-top:6px">Copy pitch</button></details>` : ""}</td>
+        <td><select data-act="link-status" data-id="${esc(l._id)}" aria-label="Status">${LINK_STATUS.map(s => `<option ${l.status === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+        <td><input type="date" data-act="link-next" data-id="${esc(l._id)}" value="${esc(l.next || "")}" aria-label="Next follow-up"></td>
+        <td><div class="row-btns"><button type="button" class="ghost small" data-act="link-pitch" data-id="${esc(l._id)}" ${genBusy ? "disabled" : ""}>${genBusy === "pitch-" + l._id ? "Writing…" : l.pitch ? "Rewrite pitch" : "Write pitch"}</button>
+          <button type="button" class="ghost small" data-act="link-del" data-id="${esc(l._id)}">Remove</button></div></td></tr>`;
+    }).join("");
+    return `<div class="panel">
+      <h2>Link building</h2>
+      <p class="hint">Earned mentions on trusted local sites. The tool finds targets and writes the pitches; a person sends them and builds the relationship. Never pay for links.</p>
+      <div class="pipeline">${counts.map(([s, n]) => `<span>${s} <b>${n}</b></span>`).join("")}</div>
+      <div class="row-btns">
+        <button type="button" data-act="link-cited">Add sites the AI cites</button>
+        <button type="button" class="ghost" data-act="link-suggest" ${genBusy ? "disabled" : ""}>${genBusy === "suggest" ? "Thinking…" : "Suggest local targets"}</button>
+      </div>
+      <div class="status" id="linkStatus" role="status"></div>
+      ${links.length ? `<div class="table-wrap"><table><thead><tr><th>Target</th><th>Status</th><th>Follow up</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>` : `<p class="hint">No targets yet. Start with the sites the AI cites, then add local associations, roundups and partners.</p>`}
+      <form class="inline" id="linkForm" novalidate>
+        <div class="grid2f">
+          <label for="lk_name">Add a target<input id="lk_name" class="keep" placeholder="e.g. Pointe-Claire Village merchants" autocomplete="off"></label>
+          <label for="lk_url">Website<input id="lk_url" class="keep" placeholder="https://…" autocomplete="off"></label>
+        </div>
+        <div class="row-btns"><button type="submit" class="ghost">Add target</button></div>
+      </form>
+      <p class="hint">The Monday check also researches new targets with live web search and adds them here.</p>
+    </div>`;
+  }
+
+  function renderWorkTab(c) {
+    if (clientTab === "plan") return planTab(c);
+    if (clientTab === "assets") return assetsTab(c);
+    if (clientTab === "links") return linksTab(c);
+    return "";
+  }
+
+  function captureKeep() {
+    const out = {}; const a = document.activeElement;
+    document.querySelectorAll("#content .keep").forEach(el => { out[el.id] = el.value; });
+    return { vals: out, focus: a && a.id, sel: a && "selectionStart" in a ? [a.selectionStart, a.selectionEnd] : null, open: !!document.querySelector("#content details.panel[open]") };
+  }
+  function restoreKeep(k) {
+    if (!k) return;
+    Object.entries(k.vals).forEach(([id, v]) => { const el = $(id); if (el && v !== undefined) el.value = v; });
+    if (k.open) { const d = document.querySelector("#content details.panel"); if (d) d.open = true; }
+    if (k.focus) { const el = $(k.focus); if (el) { el.focus(); if (k.sel && el.setSelectionRange) try { el.setSelectionRange(k.sel[0], k.sel[1]); } catch {} } }
+  }
+
+  function workStatus(id, msg, err) { const s = $(id); if (s) { s.textContent = msg; s.classList.toggle("err", !!err); } }
+
+  async function saveIntake(e) {
+    e.preventDefault();
+    const c = currentClient();
+    const g = (k) => ($("in_" + k) ? $("in_" + k).value.trim() : "");
+    const intake = {}; ["phone", "address", "hours", "services", "about", "years", "booking", "languages", "reviews", "rating", "gbp", "bing", "fresha"].forEach(k => intake[k] = g(k));
+    try {
+      await db.doc(`clients/${c.id}`).update({ intake });
+      document.querySelectorAll("#content .keep").forEach(el => el.classList.remove("keep"));
+      workStatus("intakeStatus", "Saved.");
+    } catch { workStatus("intakeStatus", "Couldn't save. You may not have edit access.", true); }
+  }
+
+  async function createPlan() {
+    const c = currentClient(); const i = c.intake || {};
+    let n = 0;
+    for (const t of TASK_TEMPLATE) {
+      const already = t.done ? !!t.done(i, c) : false;
+      try {
+        await db.doc(`clients/${c.id}/tasks/${t.id}`).set({ id: t.id, area: t.area, owner: t.owner, title: t.title, how: t.how, order: n++, status: already ? "Done" : "To do", note: already ? "Already in place at start" : "", createdAt: new Date().toISOString() });
+      } catch { break; }
+    }
+  }
+
+  async function setTaskStatus(id, status) {
+    const c = currentClient(); const t = tasks.find(x => x.id === id); if (!t || t.status === status) return;
+    try {
+      await db.doc(`clients/${c.id}/tasks/${id}`).update({ status, doneAt: status === "Done" ? new Date().toISOString() : null });
+      if (status === "Done") await db.collection(`clients/${c.id}/changes`).add({ date: today(), what: t.title, targets: t.area, taskId: id, loggedAt: new Date().toISOString() });
+    } catch {}
+  }
+
+  async function generateKit(key) {
+    if (!sample) { workStatus("genStatus", "Writing needs Claude access, which isn't available in this view.", true); return; }
+    const c = currentClient(); genBusy = key; render();
+    try {
+      const out = await sample.json(kitPrompt(key, c), { cache: false, modelTier: "default" });
+      const sections = (out && Array.isArray(out.sections) ? out.sections : []).map(s => ({ title: String(s.title || ""), body: String(s.body || "") })).filter(s => s.body);
+      if (!sections.length) throw new Error("The kit came back empty. Try again.");
+      await db.doc(`clients/${c.id}/assets/${key}`).set({ key, sections, generatedAt: new Date().toISOString() });
+    } catch (err) { genBusy = null; render(); workStatus("genStatus", friendly(err), true); return; }
+    genBusy = null; render();
+  }
+
+  async function addCitedLinks() {
+    const c = currentClient();
+    const search = runs.filter(r => r.mode === SEARCH);
+    const last = search[search.length - 1];
+    if (!last) { workStatus("linkStatus", "No weekly check with web search yet. Sources appear after Monday's check.", true); return; }
+    const counts = new Map();
+    for (const r of last.results) for (const d of (r.sources || [])) counts.set(d, (counts.get(d) || 0) + 1);
+    const site = norm(c.website || "").replace(/ /g, "");
+    let added = 0;
+    for (const [d, n] of counts) {
+      if (site && norm(d).replace(/ /g, "").includes(site)) continue;
+      if (links.some(l => (l.url || "").includes(d))) continue;
+      await db.collection(`clients/${c.id}/links`).add({ name: d, url: "https://" + d, type: "Directory / booking site", why: `Cited in ${n} answer${n === 1 ? "" : "s"} in the latest weekly check. Get the business listed here.`, status: "Ready to pitch", source: "cited", addedAt: new Date().toISOString() });
+      added++;
+    }
+    workStatus("linkStatus", added ? `Added ${added} site${added === 1 ? "" : "s"} the AI cites.` : "Those sites are already in the list.");
+  }
+
+  async function suggestLinks() {
+    if (!sample) { workStatus("linkStatus", "Suggestions need Claude access, which isn't available in this view.", true); return; }
+    const c = currentClient(); genBusy = "suggest"; render();
+    try {
+      const comp = (() => { const r = runs.filter(x => x.mode === SEARCH).slice(-1)[0] || runs.slice(-1)[0]; return r ? summarize(r.results, c.name).sov.filter(([n]) => !sameBiz(n, c.name)).map(([n]) => n).slice(0, 5) : []; })();
+      const out = await sample.json(`Suggest 8 link and citation targets for a local business.\n\nFacts:\n${factsText(c)}\nCompetitors AI recommends instead: ${comp.join(", ") || "unknown"}\n\nMix these types: Association, Local media, Roundup, Partner, Supplier, Community, Directory. Prefer real organizations you are confident exist in this area; if unsure, describe the kind of organization to look for instead of inventing a name. No URLs. Never suggest paying for links.\n\nReturn JSON only: {"targets":[{"name":"...","type":"...","why":"one sentence"}]}`, { cache: false });
+      const ts = (out && Array.isArray(out.targets) ? out.targets : []).slice(0, 10);
+      for (const t of ts) {
+        if (!t || !t.name || links.some(l => norm(l.name) === norm(t.name))) continue;
+        await db.collection(`clients/${c.id}/links`).add({ name: String(t.name), url: "", type: String(t.type || ""), why: String(t.why || ""), status: "To research", source: "claude", addedAt: new Date().toISOString() });
+      }
+      genBusy = null; render(); workStatus("linkStatus", `Added ${ts.length} suggestions. Check each one exists before pitching.`);
+    } catch (err) { genBusy = null; render(); workStatus("linkStatus", friendly(err), true); }
+  }
+
+  async function writePitch(id) {
+    if (!sample) { workStatus("linkStatus", "Pitches need Claude access, which isn't available in this view.", true); return; }
+    const c = currentClient(); const l = links.find(x => x._id === id); if (!l) return;
+    genBusy = "pitch-" + id; render();
+    try {
+      const out = await sample.json(`Write a short, personal outreach email from the owner of this business to ${l.name}${l.url ? " (" + l.url + ")" : ""}, a ${l.type || "local organization"}. Goal: ${l.why || "be listed or mentioned on their site"}.\n\nFacts:\n${factsText(c)}\n\n90 to 140 words. Specific about why the business fits them, one clear ask, friendly, no flattery, no offer of payment or free services for a link. ${FACT_RULES}\n\nReturn JSON only: {"subject":"...","body":"..."}`, { cache: false });
+      if (!out || !out.body) throw new Error("The pitch came back empty. Try again.");
+      await db.doc(`clients/${c.id}/links/${id}`).update({ pitch: { subject: String(out.subject || ""), body: String(out.body) } });
+    } catch (err) { workStatus("linkStatus", friendly(err), true); }
+    genBusy = null; render();
+  }
+
+  async function addLinkManual(e) {
+    e.preventDefault();
+    const c = currentClient(); const name = $("lk_name").value.trim(); const url = $("lk_url").value.trim();
+    if (!name) { workStatus("linkStatus", "Add a name for the target.", true); return; }
+    try {
+      await db.collection(`clients/${c.id}/links`).add({ name, url: url && !/^https?:\/\//.test(url) ? "https://" + url : url, type: "", why: "", status: "To research", source: "manual", addedAt: new Date().toISOString() });
+      $("lk_name").value = ""; $("lk_url").value = "";
+    } catch { workStatus("linkStatus", "Couldn't add the target.", true); }
+  }
+
+  async function onAction(e) {
+    const el = e.target.closest("[data-act]"); if (!el || !$("content").contains(el)) return;
+    const act = el.dataset.act; const c = currentClient();
+    if (e.type === "click") {
+      if (act === "tab") { clientTab = el.dataset.tab; render(); }
+      else if (act === "plan-create") { el.disabled = true; await createPlan(); }
+      else if (act === "gen") generateKit(el.dataset.kit);
+      else if (act === "copy") {
+        try { await navigator.clipboard.writeText(copyMap[el.dataset.copy] || ""); el.textContent = "Copied"; }
+        catch { el.textContent = "Copy not allowed here"; }
+        setTimeout(() => { el.textContent = el.dataset.copy === "schema" ? "Copy" : el.dataset.copy.startsWith("pitch-") ? "Copy pitch" : "Copy"; }, 1500);
+      }
+      else if (act === "link-cited") addCitedLinks();
+      else if (act === "link-suggest") suggestLinks();
+      else if (act === "link-pitch") writePitch(el.dataset.id);
+      else if (act === "link-del") { try { await db.doc(`clients/${c.id}/links/${el.dataset.id}`).delete(); } catch {} }
+    } else if (e.type === "change") {
+      if (act === "task-status") setTaskStatus(el.dataset.id, el.value);
+      else if (act === "link-status") { try { await db.doc(`clients/${c.id}/links/${el.dataset.id}`).update({ status: el.value }); } catch {} }
+      else if (act === "link-next") { try { await db.doc(`clients/${c.id}/links/${el.dataset.id}`).update({ next: el.value }); } catch {} }
+    }
+  }
+
+  function onSubmit(e) {
+    if (e.target.id === "intakeForm") saveIntake(e);
+    else if (e.target.id === "linkForm") addLinkManual(e);
+  }
+
+  function applyView() {
+    const how = location.hash === "#how";
+    document.querySelector("main").hidden = how;
+    $("howView").hidden = !how;
+    document.querySelectorAll(".viewnav a").forEach(a => a.setAttribute("aria-current", (a.getAttribute("href") === "#how") === how ? "page" : "false"));
   }
 
   // ---------- Data ----------
@@ -450,9 +1047,13 @@ details.ans .text { white-space: pre-wrap; font-size: 13px; background: var(--bg
     if (selectedId === id && unsubRuns) return;
     selectedId = id; confirmRemove = false;
     if (unsubRuns) unsubRuns(); if (unsubChanges) unsubChanges();
-    runs = []; changes = [];
+    unsubWork.forEach(u => u()); unsubWork = [];
+    runs = []; changes = []; tasks = []; assets = {}; links = [];
     render();
     if (!db || !id) return;
+    unsubWork.push(db.collection(`clients/${id}/tasks`).onSnapshot(snap => { tasks = snap.docs.map(d => d.data()); render(); }, () => {}));
+    unsubWork.push(db.collection(`clients/${id}/assets`).onSnapshot(snap => { assets = {}; snap.docs.forEach(d => { assets[d.id] = d.data(); }); render(); }, () => {}));
+    unsubWork.push(db.collection(`clients/${id}/links`).onSnapshot(snap => { links = snap.docs.map(d => ({ ...d.data(), _id: d.id })); render(); }, () => {}));
     unsubRuns = db.collection(`clients/${id}/runs`).orderBy("at", "asc").limit(300).onSnapshot(snap => {
       runs = snap.docs.map(d => d.data()); render();
     }, () => {});
@@ -548,7 +1149,12 @@ Answers: ${JSON.stringify(results.map((r, i) => ({ i, question: r.q, answer: r.a
 
   // ---------- Boot ----------
   render();
+  applyView();
+  window.addEventListener("hashchange", applyView);
   $("addClient").addEventListener("submit", addClient);
+  $("content").addEventListener("click", onAction);
+  $("content").addEventListener("change", onAction);
+  $("content").addEventListener("submit", onSubmit);
   if (window.claude && typeof window.claude.use === "function") {
     window.claude.use("sample").then(s => { sample = s; }).catch(() => {});
     const timer = setTimeout(() => { if (dbState === "loading") { dbState = "none"; render(); } }, 10000);
