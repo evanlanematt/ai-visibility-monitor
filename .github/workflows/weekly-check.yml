@@ -16,7 +16,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Check setup
+        id: setup
+        run: |
+          if [ -f config.toml ]; then echo "ready=true" >> "$GITHUB_OUTPUT"; else echo "No config.toml yet: copy config.example.toml to config.toml, add your clients, and commit it. Skipping this run."; echo "ready=false" >> "$GITHUB_OUTPUT"; fi
       - name: Run check
+        if: steps.setup.outputs.ready == 'true'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -24,9 +29,10 @@ jobs:
           MONITOR_WEBHOOK_URL: ${{ secrets.MONITOR_WEBHOOK_URL }}
         run: python monitor.py run
       - name: Save history
+        if: steps.setup.outputs.ready == 'true'
         run: |
           git config user.name "visibility-bot"
           git config user.email "visibility-bot@users.noreply.github.com"
-          git add visibility.db report.html
+          git add -f visibility.db report.html
           git commit -m "Weekly AI visibility check" || echo "No changes"
           git push
