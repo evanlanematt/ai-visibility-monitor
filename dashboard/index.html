@@ -666,6 +666,7 @@ button.small { padding: 5px 10px; font-size: 13px; }
     const keep = captureKeep();
     $("content").innerHTML = headHtml + tabsBar(showingExample) + (showingExample || clientTab === "results" ? resultsBody : renderWorkTab(client));
     restoreKeep(keep);
+    reapplyMsgs();
 
     const rn = $("runNow"); if (rn) rn.addEventListener("click", runNow);
     const rb = $("removeBtn"); if (rb) rb.addEventListener("click", removeClient);
@@ -907,7 +908,9 @@ button.small { padding: 5px 10px; font-size: 13px; }
     if (k.focus) { const el = $(k.focus); if (el) { el.focus(); if (k.sel && el.setSelectionRange) try { el.setSelectionRange(k.sel[0], k.sel[1]); } catch {} } }
   }
 
-  function workStatus(id, msg, err) { const s = $(id); if (s) { s.textContent = msg; s.classList.toggle("err", !!err); } }
+  const msgs = {};
+  function workStatus(id, msg, err) { msgs[id] = { msg, err: !!err, at: Date.now() }; const s = $(id); if (s) { s.textContent = msg; s.classList.toggle("err", !!err); } }
+  function reapplyMsgs() { for (const [id, m] of Object.entries(msgs)) { if (Date.now() - m.at > 15000) { delete msgs[id]; continue; } const s = $(id); if (s) { s.textContent = m.msg; s.classList.toggle("err", m.err); } } }
 
   async function saveIntake(e) {
     e.preventDefault();
@@ -1096,7 +1099,7 @@ button.small { padding: 5px 10px; font-size: 13px; }
     try {
       await db.doc(`clients/${id}`).delete();
       selectedId = null; if (unsubRuns) unsubRuns(); if (unsubChanges) unsubChanges(); unsubRuns = unsubChanges = null;
-    } catch { const s = $("runStatus"); if (s) { s.textContent = "Couldn't remove the client."; s.classList.add("err"); } }
+    } catch { workStatus("runStatus", "Couldn't remove the client.", true); }
   }
 
   // ---------- Manual check (Claude, no web search) ----------
@@ -1109,7 +1112,7 @@ button.small { padding: 5px 10px; font-size: 13px; }
 
   async function runNow() {
     const client = currentClient();
-    const say = (m, err) => { const s = $("runStatus"); if (s) { s.textContent = m; s.classList.toggle("err", !!err); } };
+    const say = (m, err) => workStatus("runStatus", m, err);
     if (!sample) { say("Manual checks need Claude access, which isn't available in this view. The weekly check still runs.", true); return; }
     running = true; render(); say("Asking 8 questions… 0 of 8 answered");
     const results = client.questions.map(q => ({ ...q }));
